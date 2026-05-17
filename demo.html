@@ -26,8 +26,22 @@
       z-index: 20;
       border-bottom: 1px solid rgba(0,0,0,.04);
     }
-    .demo-logo { font-family: var(--vestige-brand-font, var(--wvr-font-logo)); font-size: clamp(20px, 3.8vw, 34px); line-height: .95; letter-spacing: .01em; text-transform: uppercase; text-align: center; white-space: nowrap; }
-    .demo-icon-row { display: flex; gap: 14px; justify-self: end; align-items: center; }
+    .demo-logo {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      font-family: var(--vestige-brand-font, var(--wvr-font-logo));
+      font-size: clamp(20px, 3.8vw, 34px);
+      line-height: .95;
+      letter-spacing: .01em;
+      text-transform: uppercase;
+      text-align: center;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .demo-icon-row { display: flex; gap: 14px; justify-self: end; align-items: center; z-index: 2; }
     .demo-icon { font-size: 28px; line-height: 1; }
     .demo-menu { font-size: 36px; line-height: 1; }
     .wvr-hero { --vestige-product-opacity: 1; --vestige-product-scale: 1; --vestige-product-y: 0px; --vestige-gap: 8vw; }
@@ -152,9 +166,12 @@
       display: inline-grid;
       place-items: center;
       border-radius: 999px;
+      justify-self: start;
+      align-self: center;
+      z-index: 2;
     }
     .menu-button:hover { background: var(--wvr-soft-pink); }
-    .menu-button span { font-size: 36px; line-height: 1; transform: translateY(-2px); }
+    .menu-button span { display: block; font-size: 36px; line-height: 1; transform: translateY(-2px); }
     .menu-backdrop {
       position: fixed;
       inset: 0;
