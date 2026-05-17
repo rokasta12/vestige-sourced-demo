@@ -1,0 +1,242 @@
+/* White Vintage Reveal Theme
+   Use in Shopify: Online Store → Themes → Edit code → assets/base.css (paste near bottom)
+   Fonts: add the Google Fonts link in theme.liquid before </head>.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Bungee&family=Changa+One:ital@0;1&family=Dela+Gothic+One&family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=League+Gothic&family=Oswald:wght@500;600;700&family=Playfair+Display:wght@700;800;900&family=Shrikhand&family=Ultra&display=swap');
+
+:root {
+  --wvr-bg: #ffffff;
+  --wvr-text: #050505;
+  --wvr-muted: #6f6f6f;
+  --wvr-line: #ededed;
+  --wvr-pink: #b7a65e;
+  --wvr-olive-gold: #b7a65e;
+  --wvr-pink-strong: #a8964f;
+  --wvr-olive-gold-strong: #a8964f;
+  --wvr-soft-olive-gold: #fff3f8;
+  --wvr-brand-color: #b7a65e;
+  --vestige-brand-font: var(--wvr-font-logo); /* configurable: Archivo Black, Dela Gothic One, Anton, Bebas Neue, League Gothic, Oswald, Bungee, Changa One, Shrikhand, Ultra, Playfair, DM Serif */
+  --vestige-text-layer: 3;
+  --vestige-product-layer: 2;
+  --vestige-product-scale: 1;
+  --vestige-product-opacity: 1;
+  --vestige-gap: 8vw;
+  --vestige-brand-size: clamp(3rem, 13vw, 9.5rem);
+
+  --wvr-font-logo: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
+  --wvr-font-heading: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
+  --wvr-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --wvr-page-x: clamp(18px, 4vw, 56px);
+  --wvr-header-h: 92px;
+}
+
+html,
+body {
+  background: var(--wvr-bg);
+  color: var(--wvr-text);
+  font-family: var(--wvr-font-body);
+}
+
+/* Header like the reference: big empty white area, centered loud logo. */
+.header,
+.shopify-section-header-sticky,
+.announcement-bar-section,
+sticky-header {
+  background: var(--wvr-bg) !important;
+  color: var(--wvr-text) !important;
+}
+
+.header__heading-logo,
+.header__heading-link,
+.header__heading,
+.site-header__logo,
+.header .h2 {
+  font-family: var(--wvr-font-logo) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+}
+
+.header__icon,
+.header__menu-item,
+.list-menu__item,
+.cart-count-bubble {
+  color: var(--wvr-text) !important;
+}
+
+/* Product grid: clean gallery, no heavy cards. */
+.card,
+.card-wrapper,
+.product-card-wrapper,
+.collection .grid__item {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.card__heading,
+.product__title,
+.collection-hero__title,
+.title,
+h1, h2, h3 {
+  font-family: var(--wvr-font-heading);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.price,
+.card-information,
+.product__text,
+.product-form__input,
+.facets__summary,
+.facet-filters__label {
+  font-family: var(--wvr-font-body);
+}
+
+.button,
+.shopify-payment-button__button,
+.product-form__submit,
+.customer button,
+button.shopify-challenge__button {
+  min-height: 46px;
+  border-radius: 999px !important;
+  border: 1px solid var(--wvr-text) !important;
+  background: var(--wvr-text) !important;
+  color: var(--wvr-bg) !important;
+  font-family: var(--wvr-font-body) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.button:hover,
+.product-form__submit:hover,
+.shopify-payment-button__button:hover {
+  background: var(--wvr-pink-strong) !important;
+  color: var(--wvr-text) !important;
+  border-color: var(--wvr-pink-strong) !important;
+  transform: translateY(-1px);
+}
+
+.button--secondary,
+.button--tertiary {
+  background: var(--wvr-bg) !important;
+  color: var(--wvr-text) !important;
+}
+
+.badge,
+.price__badge-sale {
+  background: var(--wvr-pink) !important;
+  color: var(--wvr-text) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Hero reveal section */
+.wvr-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(420px, 74vh, 760px);
+  background: var(--wvr-bg);
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.wvr-hero__brand {
+  position: absolute;
+  z-index: var(--vestige-text-layer, 3);
+  left: 50%;
+  top: 47%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  font-family: var(--vestige-brand-font, var(--wvr-font-logo));
+  font-size: var(--vestige-brand-size, clamp(3rem, 13vw, 9.5rem));
+  line-height: 0.86;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--wvr-brand-color, var(--wvr-pink));
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.wvr-hero__track {
+  position: absolute;
+  inset: 0;
+  z-index: var(--vestige-product-layer, 2);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: max-content;
+  animation: wvr-slide-left 22s linear infinite;
+  will-change: transform;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
+}
+
+.wvr-hero__loop {
+  --vestige-loop-gap: clamp(46px, var(--vestige-gap, 8vw), 140px);
+  display: flex;
+  align-items: center;
+  gap: var(--vestige-loop-gap);
+  padding-right: var(--vestige-loop-gap);
+  flex: 0 0 auto;
+}
+
+.wvr-hero__product {
+  display: block;
+  width: clamp(130px, 23vw, 340px);
+  max-height: 48vh;
+  object-fit: contain;
+  opacity: var(--vestige-product-opacity, 1);
+  transform: scale(var(--vestige-product-scale, 1));
+  filter: none;
+}
+
+.wvr-hero__product:nth-child(2n) {
+  width: clamp(95px, 17vw, 260px);
+  transform: translateY(18px) scale(calc(var(--vestige-product-scale, 1) * .88));
+}
+
+.wvr-hero__product:nth-child(3n) {
+  width: clamp(160px, 28vw, 410px);
+  transform: translateY(-8px) scale(calc(var(--vestige-product-scale, 1) * 1.08));
+}
+
+@keyframes wvr-slide-left {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(-50%,0,0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wvr-hero__track { animation: none; transform: translateX(0); }
+}
+
+@media (max-width: 749px) {
+  :root { --wvr-header-h: 84px; }
+
+  .wvr-hero {
+    min-height: 430px;
+  }
+
+  .wvr-hero__brand {
+    top: 48%;
+    font-size: clamp(3.1rem, 18vw, 5.2rem);
+  }
+
+  .wvr-hero__track {
+    animation-duration: 18s;
+  }
+
+  .wvr-hero__loop {
+    --vestige-loop-gap: 44px;
+  }
+}

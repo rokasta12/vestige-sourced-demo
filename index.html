@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vestige Sourced — Configurable White Vintage Reveal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Archivo+Black&family=Anton&family=Bebas+Neue&family=Bungee&family=Changa+One:ital@0;1&family=Dela+Gothic+One&family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=League+Gothic&family=Oswald:wght@500;600;700&family=Playfair+Display:wght@700;800;900&family=Shrikhand&family=Ultra&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    body { margin: 0; }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #050505; outline-offset: 4px; }
+    .skip-link { position: fixed; left: 12px; top: 12px; z-index: 100; transform: translateY(-140%); background: #050505; color: #fff; padding: 12px 14px; border-radius: 999px; font: 900 11px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+    .skip-link:focus { transform: translateY(0); }
+    .demo-header {
+      height: 120px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 var(--wvr-page-x);
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(0,0,0,.04);
+    }
+    .demo-logo { font-family: var(--vestige-brand-font, var(--wvr-font-logo)); font-size: clamp(20px, 3.8vw, 34px); letter-spacing: .01em; text-transform: uppercase; text-align: center; white-space: nowrap; }
+    .demo-icon-row { display: flex; gap: 14px; justify-self: end; align-items: center; }
+    .demo-icon { font-size: 28px; line-height: 1; }
+    .demo-menu { font-size: 36px; line-height: 1; }
+    .wvr-hero { --vestige-product-opacity: 1; --vestige-product-scale: 1; --vestige-product-y: 0px; --vestige-gap: 8vw; }
+    .wvr-hero__brand { font-family: var(--vestige-brand-font, var(--wvr-font-logo)); z-index: var(--vestige-text-layer, 3); }
+    .wvr-hero__track { z-index: var(--vestige-product-layer, 2); gap: 0; transform: translate3d(0,0,0); backface-visibility: hidden; }
+    .wvr-hero__loop { --vestige-loop-gap: clamp(34px, var(--vestige-gap), 160px); display: flex; align-items: center; gap: var(--vestige-loop-gap); padding-right: var(--vestige-loop-gap); flex: 0 0 auto; }
+    .wvr-hero__product { opacity: var(--vestige-product-opacity); transform: translateY(var(--vestige-product-y)) scale(var(--vestige-product-scale)); }
+    .wvr-hero__product:nth-child(2n) { transform: translateY(calc(var(--vestige-product-y) + 18px)) scale(calc(var(--vestige-product-scale) * .88)); }
+    .wvr-hero__product:nth-child(3n) { transform: translateY(calc(var(--vestige-product-y) - 8px)) scale(calc(var(--vestige-product-scale) * 1.08)); }
+    .wvr-hero[data-items="4"] .wvr-hero__loop .wvr-hero__product:nth-child(n+5),
+    .wvr-hero[data-items="6"] .wvr-hero__loop .wvr-hero__product:nth-child(n+7),
+    .wvr-hero[data-items="8"] .wvr-hero__loop .wvr-hero__product:nth-child(n+9) { display: none; }
+    @keyframes wvr-slide-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+    .demo-products {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(36px, 7vw, 110px);
+      padding: clamp(70px, 12vw, 150px) var(--wvr-page-x);
+    }
+    .demo-product { text-align: center; }
+    .demo-product img {
+      width: min(100%, 330px);
+      height: 330px;
+      object-fit: contain;
+      background: white;
+      mix-blend-mode: multiply;
+    }
+    .demo-product h2 { margin: 18px 0 6px; font-size: 12px; letter-spacing: .08em; }
+    .demo-product p { margin: 0; color: var(--wvr-muted); font-weight: 700; font-size: 12px; letter-spacing: .12em; }
+    .config-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.22);
+      z-index: 40;
+      display: none;
+    }
+    .config-backdrop.is-open { display: block; }
+    .config-panel {
+      position: fixed;
+      right: 18px;
+      top: 18px;
+      bottom: 18px;
+      width: min(420px, calc(100vw - 36px));
+      background: #fff;
+      color: #050505;
+      border: 1px solid #e8e8e8;
+      border-radius: 22px;
+      z-index: 50;
+      transform: translateX(calc(100% + 30px));
+      transition: transform 220ms ease;
+      box-shadow: 0 20px 80px rgba(0,0,0,.16);
+      overflow: auto;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .config-panel.is-open { transform: translateX(0); }
+    .config-panel__head {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px;
+      border-bottom: 1px solid #eee;
+      z-index: 1;
+    }
+    .config-panel h2 { margin: 0; font: 900 20px/1 Archivo, Inter, sans-serif; letter-spacing: -.02em; text-transform: uppercase; }
+    .config-close { border: 0; background: #f3f3f3; border-radius: 999px; width: 38px; height: 38px; cursor: pointer; font-size: 22px; }
+    .config-panel__body { padding: 22px; display: grid; gap: 20px; }
+    .field { display: grid; gap: 9px; }
+    .field label { font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .field small { color: #6f6f6f; line-height: 1.35; }
+    .field input[type="text"], .field select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 13px;
+      padding: 13px 14px;
+      font: 700 14px/1 Inter, system-ui, sans-serif;
+      background: #fff;
+    }
+    .field input[type="color"] { width: 100%; height: 48px; border: 1px solid #ddd; border-radius: 13px; padding: 4px; background: #fff; }
+    .field input[type="range"] { width: 100%; accent-color: var(--wvr-brand-color); }
+    .range-row { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: #6f6f6f; }
+    .segmented { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .segmented button {
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 999px;
+      padding: 12px;
+      font: 800 11px/1 Inter, system-ui, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .segmented button.is-active { background: #050505; color: #fff; border-color: #050505; }
+    .config-actions { display: flex; gap: 10px; padding-top: 4px; }
+    .config-actions button {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid #050505;
+      padding: 13px;
+      font: 900 11px/1 Inter, system-ui, sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .config-actions .primary { background: #050505; color: #fff; }
+    .config-actions .secondary { background: #fff; color: #050505; }
+
+    .menu-button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: #050505;
+      font: inherit;
+      cursor: pointer;
+      width: 48px;
+      height: 48px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+    }
+    .menu-button:hover { background: var(--wvr-soft-pink); }
+    .menu-button span { font-size: 36px; line-height: 1; transform: translateY(-2px); }
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.24);
+      z-index: 60;
+      display: none;
+    }
+    .menu-backdrop.is-open { display: block; }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: min(420px, 92vw);
+      background: #fff;
+      color: #050505;
+      z-index: 70;
+      transform: translateX(-105%);
+      transition: transform 240ms ease;
+      border-right: 1px solid #eeeeee;
+      box-shadow: 20px 0 80px rgba(0,0,0,.16);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .side-menu.is-open { transform: translateX(0); }
+    .side-menu__head {
+      min-height: 112px;
+      padding: 24px var(--wvr-page-x) 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #eeeeee;
+    }
+    .side-menu__brand {
+      font-family: var(--vestige-brand-font, var(--wvr-font-logo));
+      font-size: clamp(28px, 8vw, 46px);
+      letter-spacing: .02em;
+      color: var(--wvr-brand-color);
+      text-transform: uppercase;
+    }
+    .side-menu__close {
+      border: 0;
+      background: #f5f5f5;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .side-menu__body { padding: 18px var(--wvr-page-x); overflow: auto; }
+    .side-menu__label {
+      margin: 0 0 16px;
+      font: 900 11px/1 Inter, system-ui, sans-serif;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: #777;
+    }
+    .side-menu__nav { display: grid; gap: 2px; }
+    .side-menu__nav a {
+      color: #050505;
+      text-decoration: none;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 18px;
+      padding: 11px 0;
+      border-bottom: 1px solid #efefef;
+    }
+    .side-menu__nav strong {
+      font-family: var(--wvr-font-heading);
+      font-size: clamp(24px, 7vw, 38px);
+      line-height: .92;
+      letter-spacing: -.04em;
+      text-transform: uppercase;
+    }
+    .side-menu__nav small {
+      font: 800 10px/1 Inter, system-ui, sans-serif;
+      color: var(--wvr-brand-color);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .side-menu__nav a:hover strong { color: var(--wvr-brand-color); }
+    .side-menu__config-button {
+      width: 100%;
+      min-height: 48px;
+      margin: 0 0 14px;
+      border: 1px solid #050505;
+      border-radius: 999px;
+      background: #050505;
+      color: #fff;
+      cursor: pointer;
+      font: 900 11px/1 Inter, system-ui, sans-serif;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+    }
+    .side-menu__config-button:hover {
+      background: var(--wvr-brand-color);
+      border-color: var(--wvr-brand-color);
+      color: #050505;
+      transform: translateY(-1px);
+    }
+    .side-menu__products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 26px;
+    }
+    .side-menu__products img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      background: #fff;
+      mix-blend-mode: multiply;
+    }
+    .side-menu__foot {
+      padding: 18px var(--wvr-page-x) 24px;
+      border-top: 1px solid #eeeeee;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #666;
+    }
+
+    @media (min-width: 900px) { .demo-products { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    @media (max-width: 749px) {
+      .demo-header { height: 92px; padding-inline: 14px; }
+      .demo-icon { display: none; }
+      .demo-logo { font-size: clamp(14px, 4.2vw, 21px); max-width: none; white-space: nowrap; line-height: 1; letter-spacing: 0; }
+      .side-menu__brand { white-space: nowrap; font-size: clamp(24px, 7vw, 38px); }
+      .wvr-hero { min-height: 520px; }
+      .wvr-hero__brand { top: 42%; }
+      .demo-products { padding-inline: 14px; gap: 28px 14px; }
+      .demo-product img { height: 220px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .wvr-hero__track { animation: none !important; transform: translate3d(0,0,0); }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="demo-header">
+    <button class="menu-button" id="openMenu" type="button" aria-label="Open menu" aria-controls="sideMenu" aria-expanded="false"><span>☰</span></button>
+    <div class="demo-logo" data-header-text>Vestige Sourced</div>
+    <div class="demo-icon-row" aria-label="Header quick actions">
+      <span class="demo-icon" aria-hidden="true">⌕</span><span class="demo-icon" aria-hidden="true">▢</span>
+    </div>
+  </header>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="side-menu" id="sideMenu" aria-label="Site menu" aria-hidden="true">
+    <div class="side-menu__head">
+      <div class="side-menu__brand" data-header-text>Vestige Sourced</div>
+      <button class="side-menu__close" id="closeMenu" type="button" aria-label="Close menu">×</button>
+    </div>
+    <div class="side-menu__body">
+      <button class="side-menu__config-button" id="menuConfigButton" type="button" aria-controls="configPanel">Configure style</button>
+      <nav class="side-menu__nav">
+        <a href="demo.html"><strong>Home</strong><small>Live</small></a>
+        <a href="#shop"><strong>Shop</strong><small>Products</small></a>
+        <a href="#reveal"><strong>Reveal</strong><small>Hero</small></a>
+        <a href="#style" id="menuOpenConfig"><strong>Style</strong><small>Config</small></a>
+        <a href="coming-soon-landing.html"><strong>Coming Soon</strong><small>Landing</small></a>
+        <a href="new-drop.html"><strong>New Drop</strong><small>Soon</small></a>
+        <a href="lookbook.html"><strong>Lookbook</strong><small>Soon</small></a>
+        <a href="about.html"><strong>About</strong><small>Soon</small></a>
+        <a href="contact.html"><strong>Contact</strong><small>Soon</small></a>
+      </nav>
+      <div class="side-menu__products" aria-label="Featured products">
+        <img src="products/vestige-product-01.jpg" alt="VESTIGE product preview">
+        <img src="products/vestige-product-05.jpg" alt="VESTIGE product preview">
+        <img src="products/vestige-product-12.jpg" alt="VESTIGE product preview">
+      </div>
+    </div>
+  </aside>
+
+
+  <section class="wvr-hero" id="vestigeHero" data-anchor="reveal" aria-label="VESTIGE hero" style="--wvr-brand-color:#B7A65E;" data-items="12">
+    <h1 class="wvr-hero__brand" data-brand-text>VESTIGE</h1>
+    <div class="wvr-hero__track" id="revealTrack">
+      <div class="wvr-hero__loop" aria-hidden="false">
+        <img class="wvr-hero__product" src="products/vestige-product-01.jpg" alt="VESTIGE vintage product 01">
+        <img class="wvr-hero__product" src="products/vestige-product-02.jpg" alt="VESTIGE vintage product 02">
+        <img class="wvr-hero__product" src="products/vestige-product-03.jpg" alt="VESTIGE vintage product 03">
+        <img class="wvr-hero__product" src="products/vestige-product-04.jpg" alt="VESTIGE vintage product 04">
+        <img class="wvr-hero__product" src="products/vestige-product-05.jpg" alt="VESTIGE vintage product 05">
+        <img class="wvr-hero__product" src="products/vestige-product-06.jpg" alt="VESTIGE vintage product 06">
+        <img class="wvr-hero__product" src="products/vestige-product-07.jpg" alt="VESTIGE vintage product 07">
+        <img class="wvr-hero__product" src="products/vestige-product-08.jpg" alt="VESTIGE vintage product 08">
+        <img class="wvr-hero__product" src="products/vestige-product-09.jpg" alt="VESTIGE vintage product 09">
+        <img class="wvr-hero__product" src="products/vestige-product-10.jpg" alt="VESTIGE vintage product 10">
+        <img class="wvr-hero__product" src="products/vestige-product-11.jpg" alt="VESTIGE vintage product 11">
+        <img class="wvr-hero__product" src="products/vestige-product-12.jpg" alt="VESTIGE vintage gold watch">
+      </div>
+      <div class="wvr-hero__loop" aria-hidden="true">
+        <img class="wvr-hero__product" src="products/vestige-product-01.jpg" alt="VESTIGE vintage product 01">
+        <img class="wvr-hero__product" src="products/vestige-product-02.jpg" alt="VESTIGE vintage product 02">
+        <img class="wvr-hero__product" src="products/vestige-product-03.jpg" alt="VESTIGE vintage product 03">
+        <img class="wvr-hero__product" src="products/vestige-product-04.jpg" alt="VESTIGE vintage product 04">
+        <img class="wvr-hero__product" src="products/vestige-product-05.jpg" alt="VESTIGE vintage product 05">
+        <img class="wvr-hero__product" src="products/vestige-product-06.jpg" alt="VESTIGE vintage product 06">
+        <img class="wvr-hero__product" src="products/vestige-product-07.jpg" alt="VESTIGE vintage product 07">
+        <img class="wvr-hero__product" src="products/vestige-product-08.jpg" alt="VESTIGE vintage product 08">
+        <img class="wvr-hero__product" src="products/vestige-product-09.jpg" alt="VESTIGE vintage product 09">
+        <img class="wvr-hero__product" src="products/vestige-product-10.jpg" alt="VESTIGE vintage product 10">
+        <img class="wvr-hero__product" src="products/vestige-product-11.jpg" alt="VESTIGE vintage product 11">
+        <img class="wvr-hero__product" src="products/vestige-product-12.jpg" alt="VESTIGE vintage gold watch">
+      </div>
+    </div>
+  </section>
+
+  <main class="demo-products" id="main" aria-label="VESTIGE products">
+    <article class="demo-product"><img src="products/vestige-product-01.jpg" alt="VESTIGE vintage product 01"><h2>VINTAGE PRODUCT 01</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-02.jpg" alt="VESTIGE vintage product 02"><h2>VINTAGE PRODUCT 02</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-03.jpg" alt="VESTIGE vintage product 03"><h2>VINTAGE PRODUCT 03</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-04.jpg" alt="VESTIGE vintage product 04"><h2>VINTAGE PRODUCT 04</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-05.jpg" alt="VESTIGE vintage product 05"><h2>VINTAGE PRODUCT 05</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-06.jpg" alt="VESTIGE vintage product 06"><h2>VINTAGE PRODUCT 06</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-07.jpg" alt="VESTIGE vintage product 07"><h2>VINTAGE PRODUCT 07</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-08.jpg" alt="VESTIGE vintage product 08"><h2>VINTAGE PRODUCT 08</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-09.jpg" alt="VESTIGE vintage product 09"><h2>VINTAGE PRODUCT 09</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-10.jpg" alt="VESTIGE vintage product 10"><h2>VINTAGE PRODUCT 10</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-11.jpg" alt="VESTIGE vintage product 11"><h2>VINTAGE PRODUCT 11</h2><p>VESTIGE</p></article>
+    <article class="demo-product"><img src="products/vestige-product-12.jpg" alt="VESTIGE vintage gold watch"><h2>VINTAGE GOLD WATCH</h2><p>VESTIGE</p></article>
+  </main>
+
+
+  <div class="config-backdrop" id="configBackdrop"></div>
+  <aside class="config-panel" id="configPanel" aria-label="Style configurator" aria-hidden="true">
+    <div class="config-panel__head">
+      <h2>Style Config</h2>
+      <button class="config-close" id="closeConfig" type="button" aria-label="Close configurator">×</button>
+    </div>
+    <div class="config-panel__body">
+      <div class="field">
+        <label for="headerName">Header text</label>
+        <input id="headerName" type="text" value="Vestige Sourced">
+        <small>This controls the top header logo and hamburger menu brand.</small>
+      </div>
+      <div class="field">
+        <label for="brandName">Hero brand text</label>
+        <input id="brandName" type="text" value="VESTIGE">
+        <small>This controls the big hero word.</small>
+      </div>
+      <div class="field">
+        <label for="brandColor">Brand color</label>
+        <input id="brandColor" type="color" value="#B7A65E">
+        <small>Changes the big olive-gold VESTIGE text and hover accent.</small>
+      </div>
+      <div class="field">
+        <label for="brandFont">Brand font</label>
+        <select id="brandFont">
+          <option value="'Archivo Black', 'Arial Black', sans-serif">Archivo Black — bold modern</option>
+          <option value="'Dela Gothic One', 'Arial Black', sans-serif">Dela Gothic One — chunky logo, closest loud style</option>
+          <option value="'Anton', Impact, sans-serif">Anton — heavy condensed poster</option>
+          <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue — tall vintage</option>
+          <option value="'League Gothic', Impact, sans-serif">League Gothic — narrow editorial vintage</option>
+          <option value="'Oswald', 'Arial Narrow', sans-serif">Oswald — condensed clean fashion</option>
+          <option value="'Bungee', 'Arial Black', sans-serif">Bungee — playful bold streetwear</option>
+          <option value="'Changa One', 'Arial Black', sans-serif">Changa One — rounded playful logo</option>
+          <option value="'Shrikhand', Georgia, serif">Shrikhand — soft retro boutique</option>
+          <option value="'Ultra', Georgia, serif">Ultra — heavy western vintage serif</option>
+          <option value="'Playfair Display', Georgia, serif">Playfair Display — fashion serif</option>
+          <option value="'DM Serif Display', Georgia, serif">DM Serif Display — boutique serif</option>
+          <option value="'Archivo', Arial, sans-serif">Archivo Heavy — clean</option>
+        </select>
+        <small>Try Dela Gothic One, Anton, Bungee, or Changa One for a closer bold logo feel.</small>
+      </div>
+      <div class="field">
+        <label>Layer balance</label>
+        <div class="segmented" id="layerButtons">
+          <button type="button" data-layer="text-front" class="is-active">Text front</button>
+          <button type="button" data-layer="items-front">Items front</button>
+        </div>
+        <small>Choose if products pass behind the brand text or in front of it.</small>
+      </div>
+      <div class="field">
+        <label for="revealItems">Revealing items</label>
+        <input id="revealItems" type="range" min="4" max="12" step="2" value="12">
+        <div class="range-row"><span>4</span><strong id="revealItemsValue">12 items</strong><span>12</span></div>
+      </div>
+      <div class="field">
+        <label for="speed">Timing / speed</label>
+        <input id="speed" type="range" min="10" max="45" step="1" value="22">
+        <div class="range-row"><span>Fast</span><strong id="speedValue">22s</strong><span>Slow</span></div>
+      </div>
+      <div class="field">
+        <label for="brandSize">Brand text size</label>
+        <input id="brandSize" type="range" min="8" max="18" step=".5" value="13">
+        <div class="range-row"><span>Small</span><strong id="brandSizeValue">13vw</strong><span>Huge</span></div>
+      </div>
+      <div class="field">
+        <label for="productScale">Product size balance</label>
+        <input id="productScale" type="range" min="70" max="135" step="5" value="100">
+        <div class="range-row"><span>Small</span><strong id="productScaleValue">100%</strong><span>Big</span></div>
+      </div>
+      <div class="field">
+        <label for="productOpacity">Product opacity balance</label>
+        <input id="productOpacity" type="range" min="35" max="100" step="5" value="100">
+        <div class="range-row"><span>Soft</span><strong id="productOpacityValue">100%</strong><span>Strong</span></div>
+      </div>
+      <div class="field">
+        <label for="productGap">Item spacing</label>
+        <input id="productGap" type="range" min="3" max="14" step=".5" value="8">
+        <div class="range-row"><span>Tight</span><strong id="productGapValue">8vw</strong><span>Wide</span></div>
+      </div>
+      <div class="config-actions">
+        <button class="primary" id="saveConfig" type="button">Save</button>
+        <button class="secondary" id="resetConfig" type="button">Reset</button>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    const defaults = {
+      headerName: 'Vestige Sourced',
+      brandName: 'VESTIGE',
+      brandColor: '#B7A65E',
+      brandFont: "'Archivo Black', 'Arial Black', sans-serif",
+      layer: 'text-front',
+      revealItems: 12,
+      speed: 22,
+      brandSize: 13,
+      productScale: 100,
+      productOpacity: 100,
+      productGap: 8
+    };
+
+    const state = { ...defaults, ...JSON.parse(localStorage.getItem('vestigeStyleConfig_v2_olive') || '{}') };
+    const $ = (id) => document.getElementById(id);
+    const root = document.documentElement;
+    const hero = $('vestigeHero');
+    const track = $('revealTrack');
+    const panel = $('configPanel');
+    const backdrop = $('configBackdrop');
+    const menu = $('sideMenu');
+    const menuBackdrop = $('menuBackdrop');
+    const openMenuButton = $('openMenu');
+
+    function setValueLabels() {
+      $('revealItemsValue').textContent = `${state.revealItems} items`;
+      $('speedValue').textContent = `${state.speed}s`;
+      $('brandSizeValue').textContent = `${state.brandSize}vw`;
+      $('productScaleValue').textContent = `${state.productScale}%`;
+      $('productOpacityValue').textContent = `${state.productOpacity}%`;
+      $('productGapValue').textContent = `${state.productGap}vw`;
+    }
+
+    function applyState() {
+      document.querySelectorAll('[data-header-text]').forEach(el => { el.textContent = state.headerName || 'Vestige Sourced'; });
+      document.querySelectorAll('[data-brand-text]').forEach(el => { el.textContent = state.brandName || 'VESTIGE'; });
+      document.title = `${state.headerName || 'Vestige Sourced'} — Configurable White Vintage Reveal`;
+      hero.setAttribute('aria-label', `${state.brandName || 'VESTIGE'} hero`);
+      hero.dataset.items = String(state.revealItems);
+      root.style.setProperty('--wvr-brand-color', state.brandColor);
+      hero.style.setProperty('--wvr-brand-color', state.brandColor);
+      root.style.setProperty('--vestige-brand-font', state.brandFont);
+      hero.style.setProperty('--vestige-brand-font', state.brandFont);
+      hero.style.setProperty('--vestige-text-layer', state.layer === 'items-front' ? 2 : 4);
+      hero.style.setProperty('--vestige-product-layer', state.layer === 'items-front' ? 5 : 3);
+      hero.style.setProperty('--vestige-product-scale', state.productScale / 100);
+      hero.style.setProperty('--vestige-product-opacity', state.productOpacity / 100);
+      hero.style.setProperty('--vestige-gap', `${state.productGap}vw`);
+      hero.style.setProperty('--vestige-product-y', state.layer === 'items-front' ? '-2px' : '0px');
+      hero.querySelector('.wvr-hero__brand').style.fontSize = `clamp(3rem, ${state.brandSize}vw, 10rem)`;
+      track.style.animationDuration = `${state.speed}s`;
+      document.querySelectorAll('#layerButtons button').forEach(btn => btn.classList.toggle('is-active', btn.dataset.layer === state.layer));
+      setValueLabels();
+    }
+
+    function syncInputs() {
+      $('headerName').value = state.headerName;
+      $('brandName').value = state.brandName;
+      $('brandColor').value = state.brandColor;
+      $('brandFont').value = state.brandFont;
+      $('revealItems').value = state.revealItems;
+      $('speed').value = state.speed;
+      $('brandSize').value = state.brandSize;
+      $('productScale').value = state.productScale;
+      $('productOpacity').value = state.productOpacity;
+      $('productGap').value = state.productGap;
+    }
+
+    function saveState() {
+      localStorage.setItem('vestigeStyleConfig_v2_olive', JSON.stringify(state));
+    }
+
+
+
+    function openMenu() {
+      menu.classList.add('is-open');
+      menuBackdrop.classList.add('is-open');
+      menu.setAttribute('aria-hidden', 'false');
+      openMenuButton.setAttribute('aria-expanded', 'true');
+    }
+    function closeMenu() {
+      menu.classList.remove('is-open');
+      menuBackdrop.classList.remove('is-open');
+      menu.setAttribute('aria-hidden', 'true');
+      openMenuButton.setAttribute('aria-expanded', 'false');
+    }
+
+    function openPanel() {
+      panel.classList.add('is-open');
+      backdrop.classList.add('is-open');
+      panel.setAttribute('aria-hidden', 'false');
+    }
+    function closePanel() {
+      panel.classList.remove('is-open');
+      backdrop.classList.remove('is-open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+
+    ['headerName', 'brandName', 'brandColor', 'brandFont', 'revealItems', 'speed', 'brandSize', 'productScale', 'productOpacity', 'productGap'].forEach(id => {
+      $(id).addEventListener('input', (event) => {
+        const value = event.target.type === 'range' ? Number(event.target.value) : event.target.value;
+        state[id] = value;
+        applyState();
+      });
+    });
+    document.querySelectorAll('#layerButtons button').forEach(btn => btn.addEventListener('click', () => {
+      state.layer = btn.dataset.layer;
+      applyState();
+    }));
+
+    $('openMenu').addEventListener('click', openMenu);
+    $('closeMenu').addEventListener('click', closeMenu);
+    menuBackdrop.addEventListener('click', closeMenu);
+    document.querySelectorAll('.side-menu__nav a').forEach(link => link.addEventListener('click', (event) => {
+      const href = link.getAttribute('href') || '';
+      if (href === '#style') {
+        event.preventDefault();
+        closeMenu();
+        openPanel();
+        return;
+      }
+      if (href.startsWith('#')) {
+        event.preventDefault();
+        closeMenu();
+        const target = href === '#reveal' ? hero : document.querySelector(href);
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }));
+    $('menuConfigButton').addEventListener('click', () => { closeMenu(); openPanel(); });
+    $('closeConfig').addEventListener('click', closePanel);
+    backdrop.addEventListener('click', closePanel);
+    $('saveConfig').addEventListener('click', () => { saveState(); closePanel(); });
+    $('resetConfig').addEventListener('click', () => {
+      Object.assign(state, defaults);
+      localStorage.removeItem('vestigeStyleConfig_v2_olive');
+      syncInputs();
+      applyState();
+    });
+    window.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closePanel(); closeMenu(); } });
+
+    syncInputs();
+    applyState();
+  </script>
+</body>
+</html>

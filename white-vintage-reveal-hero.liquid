@@ -1,0 +1,202 @@
+{% comment %}
+  White Vintage Reveal Hero
+  Shopify install:
+  1. Create file: sections/white-vintage-reveal-hero.liquid
+  2. Paste this whole file.
+  3. Theme customizer → Add section → White Vintage Reveal Hero
+  4. Configure brand text, color, font, item balance, and timing from Shopify customizer.
+  5. Add product cutout images. Use transparent PNGs or white-background product photos.
+{% endcomment %}
+
+{% liquid
+  assign brand_font = section.settings.brand_font
+  assign text_layer = 4
+  assign product_layer = 3
+  if section.settings.layer_balance == 'items_front'
+    assign text_layer = 2
+    assign product_layer = 5
+  endif
+  assign product_scale = section.settings.product_scale | divided_by: 100.0
+  assign product_opacity = section.settings.product_opacity | divided_by: 100.0
+%}
+
+<section
+  class="wvr-hero"
+  aria-label="{{ section.settings.brand_text | escape }} hero"
+  style="
+    --wvr-brand-color: {{ section.settings.brand_color }};
+    --vestige-brand-font: {{ brand_font }};
+    --vestige-brand-size: clamp(3rem, {{ section.settings.brand_size }}vw, 10rem);
+    --vestige-text-layer: {{ text_layer }};
+    --vestige-product-layer: {{ product_layer }};
+    --vestige-product-scale: {{ product_scale }};
+    --vestige-product-opacity: {{ product_opacity }};
+    --vestige-gap: {{ section.settings.item_spacing }}vw;
+  "
+>
+  {% if section.settings.header_text != blank %}
+    <span class="visually-hidden">{{ section.settings.header_text }}</span>
+  {% endif %}
+  <h1 class="wvr-hero__brand">{{ section.settings.brand_text }}</h1>
+
+  <div class="wvr-hero__track" style="animation-duration: {{ section.settings.speed }}s;">
+    {% for i in (1..2) %}
+      <div class="wvr-hero__loop" aria-hidden="{% if i == 1 %}false{% else %}true{% endif %}">
+        {% for block in section.blocks limit: section.settings.revealing_items %}
+          {% if block.settings.image != blank %}
+            {{ block.settings.image
+              | image_url: width: 900
+              | image_tag:
+                loading: 'eager',
+                class: 'wvr-hero__product',
+                alt: block.settings.alt
+            }}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "White Vintage Reveal Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "header_text",
+      "label": "Header/logo text",
+      "default": "Vestige Sourced"
+    },
+    {
+      "type": "text",
+      "id": "brand_text",
+      "label": "Big hero word",
+      "default": "VESTIGE"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Big brand color",
+      "default": "#B7A65E"
+    },
+    {
+      "type": "select",
+      "id": "brand_font",
+      "label": "Brand font",
+      "default": "'Archivo Black', 'Arial Black', sans-serif",
+      "options": [
+        { "value": "'Archivo Black', 'Arial Black', sans-serif", "label": "Archivo Black — bold modern" },
+        { "value": "'Dela Gothic One', 'Arial Black', sans-serif", "label": "Dela Gothic One — chunky logo, closest loud style" },
+        { "value": "'Anton', Impact, sans-serif", "label": "Anton — heavy condensed poster" },
+        { "value": "'Bebas Neue', Impact, sans-serif", "label": "Bebas Neue — tall vintage" },
+        { "value": "'League Gothic', Impact, sans-serif", "label": "League Gothic — narrow editorial vintage" },
+        { "value": "'Oswald', 'Arial Narrow', sans-serif", "label": "Oswald — condensed clean fashion" },
+        { "value": "'Bungee', 'Arial Black', sans-serif", "label": "Bungee — playful bold streetwear" },
+        { "value": "'Changa One', 'Arial Black', sans-serif", "label": "Changa One — rounded playful logo" },
+        { "value": "'Shrikhand', Georgia, serif", "label": "Shrikhand — soft retro boutique" },
+        { "value": "'Ultra', Georgia, serif", "label": "Ultra — heavy western vintage serif" },
+        { "value": "'Playfair Display', Georgia, serif", "label": "Playfair Display — fashion serif" },
+        { "value": "'DM Serif Display', Georgia, serif", "label": "DM Serif Display — boutique serif" },
+        { "value": "'Archivo', Arial, sans-serif", "label": "Archivo Heavy — clean" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "brand_size",
+      "label": "Brand text size, vw",
+      "min": 8,
+      "max": 18,
+      "step": 1,
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "layer_balance",
+      "label": "Layer balance",
+      "default": "text_front",
+      "options": [
+        { "value": "text_front", "label": "Text in front of products" },
+        { "value": "items_front", "label": "Products in front of text" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "revealing_items",
+      "label": "How many revealing items",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Reveal timing, seconds",
+      "min": 10,
+      "max": 45,
+      "step": 1,
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "product_scale",
+      "label": "Product size balance, percent",
+      "min": 70,
+      "max": 135,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "product_opacity",
+      "label": "Product opacity balance, percent",
+      "min": 35,
+      "max": 100,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "label": "Spacing between revealing items, vw",
+      "min": 3,
+      "max": 14,
+      "step": 1,
+      "default": 8
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_image",
+      "name": "Revealing product image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "default": "Vintage product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "White Vintage Reveal Hero",
+      "blocks": [
+        { "type": "product_image" },
+        { "type": "product_image" },
+        { "type": "product_image" },
+        { "type": "product_image" },
+        { "type": "product_image" },
+        { "type": "product_image" }
+      ]
+    }
+  ]
+}
+{% endschema %}
