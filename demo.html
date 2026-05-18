@@ -185,7 +185,9 @@
       top: 0;
       bottom: 0;
       left: 0;
-      width: min(420px, 92vw);
+      width: min(400px, calc(100vw - 36px));
+      box-sizing: border-box;
+      overflow: hidden;
       background: #fff;
       color: #050505;
       z-index: 70;
@@ -199,16 +201,22 @@
     }
     .side-menu.is-open { transform: translateX(0); }
     .side-menu__head {
-      min-height: 112px;
-      padding: 24px var(--wvr-page-x) 18px;
-      display: flex;
+      min-height: 100px;
+      padding: 22px 24px 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px;
       align-items: center;
-      justify-content: space-between;
+      gap: 14px;
       border-bottom: 1px solid #eeeeee;
     }
     .side-menu__brand {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       font-family: var(--vestige-brand-font, var(--wvr-font-logo));
-      font-size: clamp(28px, 8vw, 46px);
+      font-size: clamp(24px, 6.6vw, 40px);
+      line-height: .95;
       letter-spacing: .02em;
       color: var(--wvr-brand-color);
       text-transform: uppercase;
@@ -220,9 +228,10 @@
       height: 42px;
       border-radius: 999px;
       font-size: 24px;
+      line-height: 1;
       cursor: pointer;
     }
-    .side-menu__body { padding: 18px var(--wvr-page-x); overflow: auto; }
+    .side-menu__body { padding: 18px 24px; overflow: auto; overflow-x: hidden; }
     .side-menu__label {
       margin: 0 0 16px;
       font: 900 11px/1 Inter, system-ui, sans-serif;
@@ -232,26 +241,33 @@
     }
     .side-menu__nav { display: grid; gap: 2px; }
     .side-menu__nav a {
+      min-width: 0;
       color: #050505;
       text-decoration: none;
       display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: baseline;
-      gap: 18px;
-      padding: 11px 0;
+      grid-template-columns: minmax(0, 1fr) max-content;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
       border-bottom: 1px solid #efefef;
     }
     .side-menu__nav strong {
+      min-width: 0;
       font-family: var(--wvr-font-heading);
-      font-size: clamp(24px, 7vw, 38px);
-      line-height: .92;
-      letter-spacing: -.04em;
+      font-size: clamp(24px, 6.8vw, 36px);
+      line-height: .95;
+      letter-spacing: -.045em;
       text-transform: uppercase;
+      overflow-wrap: anywhere;
     }
     .side-menu__nav small {
-      font: 800 10px/1 Inter, system-ui, sans-serif;
+      justify-self: end;
+      max-width: 88px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font: 800 9px/1 Inter, system-ui, sans-serif;
       color: var(--wvr-brand-color);
-      letter-spacing: .12em;
+      letter-spacing: .1em;
       text-transform: uppercase;
       white-space: nowrap;
     }
@@ -302,7 +318,44 @@
       .demo-header { min-height: 78px; padding: 15px 14px; }
       .demo-icon { display: none; }
       .demo-logo { font-size: clamp(14px, 4.2vw, 21px); max-width: none; white-space: nowrap; line-height: 1; letter-spacing: 0; }
-      .side-menu__brand { white-space: nowrap; font-size: clamp(24px, 7vw, 38px); }
+      .side-menu {
+        width: 100vw;
+        max-width: none;
+        border-right: 0;
+        box-shadow: none;
+      }
+      .side-menu__head {
+        min-height: 90px;
+        padding: 22px 22px 14px;
+        grid-template-columns: minmax(0, 1fr) 42px;
+        gap: 12px;
+      }
+      .side-menu__brand {
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        font-size: clamp(20px, 5.6vw, 28px);
+        line-height: .95;
+        letter-spacing: .01em;
+      }
+      .side-menu__close { width: 42px; height: 42px; font-size: 22px; }
+      .side-menu__body { padding: 16px 22px 24px; }
+      .side-menu__config-button { min-height: 46px; margin-bottom: 14px; letter-spacing: .12em; }
+      .side-menu__nav { gap: 0; }
+      .side-menu__nav a {
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 5px;
+        padding: 12px 0;
+      }
+      .side-menu__nav strong { font-size: clamp(28px, 8.4vw, 36px); line-height: .92; }
+      .side-menu__nav small {
+        justify-self: start;
+        max-width: none;
+        font-size: 9px;
+        letter-spacing: .12em;
+      }
+      .side-menu__products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
       .wvr-hero { min-height: 520px; }
       .wvr-hero__brand { top: 42%; }
       .demo-products { padding-inline: 14px; gap: 28px 14px; }
